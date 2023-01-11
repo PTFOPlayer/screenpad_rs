@@ -32,49 +32,19 @@ fn arg_parser() {
         "--brightness" | "-b" => {
             let brightness= ARG_2.as_str();
             let b_int:i32 = brightness.parse().unwrap();
-            if b_int > 0 && b_int <= 100 {
-                let mut set = Command::new("sh");
-                let out = set
-                .arg("/usr/bin/brightness.sh")
-                .arg(brightness);
-                match out.output() {
-                    Ok(_)=>{println!("succesfully changed brightness")}
-                    Err(err)=>{println!("error: {}",err)}
-                }
-            } else {println!("wrong value, correct values are in range of 1..100")}
+            if b_int > 0 && b_int <= 100 { execute(brightness);}
+            else {println!("wrong value, correct values are in range of 1..100")}
         }
         "--overload" | "-o" => {
             let brightness= ARG_2.as_str();
-            if brightness > "0" && brightness <= "255" {
-                let mut set = Command::new("sh");
-                let out = set
-                .arg("/usr/bin/brightness.sh")
-                .arg(brightness);
-                match out.output() {
-                    Ok(_)=>{println!("succesfully changed brightness")}
-                    Err(err)=>{println!("error: {}",err)}
-                }
-            } else {println!("wrong value, correct values are in range of 1..255")}
+            if brightness > "0" && brightness <= "255" {execute(brightness);} 
+            else {println!("wrong value, correct values are in range of 1..255")}
         }
         "--off" | "-f" => {
-            let mut set = Command::new("sh");
-                let out = set
-                .arg("/usr/bin/brightness.sh")
-                .arg("0");
-            match out.output() {
-                Ok(_)=>{println!("succesfully changed brightness")}
-                Err(err)=>{println!("error: {}",err)}
-            }
+            execute("0");
         }
         "--on" | "-n" => {
-            let mut set = Command::new("sh");
-                let out = set
-                .arg("/usr/bin/brightness.sh")
-                .arg("100");
-            match out.output() {
-                Ok(_)=>{println!("succesfully changed brightness")}
-                Err(err)=>{println!("error: {}",err)}
-            }
+            execute("100");
         }
         "--help" | "-h" => {
             println!("
@@ -87,3 +57,13 @@ fn arg_parser() {
     }
 }
 
+fn execute(brightness: &str) {
+    let mut set = Command::new("sh");
+    let out = set
+    .arg("/usr/bin/brightness.sh")
+    .arg(brightness);
+    match out.output() {
+        Ok(_)=>{println!("succesfully changed brightness")}
+        Err(err)=>{println!("error: {}",err)}
+    }
+}
