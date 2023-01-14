@@ -23,3 +23,7 @@ Simple CLI wrapper to change brightness of asus screenpad
   sudo cp target/release/screenpad_rs /usr/bin
   sudo cp /src/brightness.sh /usr/bin/brightness.sh
   ```
+# TODO
+  * touch mapping on/off
+  * brightenss info 
+  * GUI 
