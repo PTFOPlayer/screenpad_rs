@@ -31,8 +31,11 @@ fn arg_parser() {
         }
         "--brightness" | "-b" => {
             let brightness= ARG_2.as_str();
-            let b_int:i32 = brightness.parse().unwrap();
-            if b_int > 0 && b_int <= 100 { execute(brightness);}
+            let b_int:i32 = match  brightness.parse() {
+                Ok(res) => res,
+                Err(_) => {println!("wrong value provided, setting value to half (50)"); 50}
+            };
+            if b_int > 0 && b_int <= 100 { execute(&format!("{}", b_int));}
             else {println!("wrong value, correct values are in range of 1..100")}
         }
         "--overload" | "-o" => {
@@ -40,14 +43,35 @@ fn arg_parser() {
             if brightness > "0" && brightness <= "255" {execute(brightness);} 
             else {println!("wrong value, correct values are in range of 1..255")}
         }
-        "--off" | "-f" => {
-            execute("0");
+        "--off" | "-f" => { execute("0"); }
+        "--on" | "-n" => { execute("100"); }
+        "--sync" | "-s" => {
+            let mut set = Command::new("cat");
+            let out = set
+            .arg("/sys/class/backlight/intel_backlight/brightness");
+            match out.output() {
+                Ok(out)=>{
+                    println!("{}", String::from_utf8(out.clone().stdout).unwrap());
+                    let val_str = String::from_utf8(out.stdout[..(out.stdout.len() -1)].to_vec()).unwrap();
+                    println!("{}", val_str);
+                    let val = val_str.parse::<i32>().expect("error ocured while getting main screen brightness");
+                    let val = val/100;
+                    execute(&format!("{}", val));
+                }
+                Err(err)=>{println!("error: {}",err)}
+            }
         }
-        "--on" | "-n" => {
-            execute("100");
+        "--current" | "-c" => {
+            let mut set = Command::new("sh");
+            let out = set
+            .arg("/usr/bin/current.sh");
+            match out.output() {
+                Ok(res) => {println!("current screenpad brightness: {}", String::from_utf8(res.stdout).unwrap())}
+                Err(_) => {println!("error ocured reading brightness")}
+                
+            }
         }
-        "--help" | "-h" => {
-            println!("
+        "--help" | "-h" => { println!("
 --brightness | -b : changes brightness in values from 1 to 100,
 --overload | -o : changes brightness in extended range from 1 to 255,
 --off | -f : turns screenpad off,

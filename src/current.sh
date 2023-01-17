@@ -1,0 +1,1 @@
+cat $HOME/.config/screenpad_rs/brightness
