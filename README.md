@@ -28,4 +28,6 @@ Simple CLI wrapper to change brightness of asus screenpad
 # TODO
   * touch mapping on/off
   * brightenss info 
+  * brightness profiles
+  * install.sh 
   * GUI 
