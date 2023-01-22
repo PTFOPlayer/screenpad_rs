@@ -1,0 +1,5 @@
+[Unit]
+Description="sync of brightness betwen main screen and screenpad"
+
+[Service]
+ExecStart = /usr/bin/screenpad_rs --watch
