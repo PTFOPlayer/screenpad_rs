@@ -51,7 +51,7 @@ fn arg_parser() {
                 Ok(out)=>{
                     let val_str = String::from_utf8(out.stdout[..(out.stdout.len() -1)].to_vec()).unwrap();
                     let val = val_str.parse::<i32>().expect("error ocured while getting main screen brightness");
-                    let val = val/100;
+                    let val = val/98;
                     execute(&format!("{}", val));
                 }
                 Err(err)=>{println!("error: {}",err)}
@@ -76,6 +76,27 @@ fn arg_parser() {
                 Err(_) => println!("error occured decreasing brightness")
             }
         }
+        "--watch" | "-w" => {
+            let mut prev = 0;
+            loop {
+                let mut set = Command::new("cat");
+                let out = set
+                .arg("/sys/class/backlight/intel_backlight/brightness");
+                match out.output() {
+                    Ok(out)=>{
+                        let val_str = String::from_utf8(out.stdout[..(out.stdout.len() -1)].to_vec()).unwrap();
+                        let val = val_str.parse::<i32>().expect("error ocured while getting main screen brightness");
+                        let val = val/98;
+                        if val != prev {
+                            prev = val;
+                            execute(&format!("{}", val));
+                        }
+                    }
+                    Err(err)=>{println!("error: {}",err)}
+                }
+                sleep(Duration::from_secs_f32(0.2))
+            }
+        }
         "--help" | "-h" => { println!("
 --brightness    | -b    : changes brightness in values from 1 to 255,
 --sync          | -s    : synchronizes brightness of screenpad with main screen
@@ -96,7 +117,7 @@ fn execute(brightness: &str) {
     .arg("/usr/bin/brightness.sh")
     .arg(brightness);
     match out.output() {
-        Ok(_)=>{println!("succesfully changed brightness")}
+        Ok(_)=>{}
         Err(err)=>{println!("error: {}",err)}
     }
 }
