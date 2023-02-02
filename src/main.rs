@@ -105,6 +105,7 @@ fn arg_parser() {
 --on            | -n    : turns screenpad on,
 --up            | -u    : increases brightness by 10
 --down          | -d    : decreases brightness by 10
+--watch         | -w    : automatic sync
 ");
         }
         &_ => {println!("wrong argument, see --help");}
