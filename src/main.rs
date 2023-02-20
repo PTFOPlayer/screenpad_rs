@@ -85,8 +85,11 @@ fn arg_parser() {
                 match out.output() {
                     Ok(out)=>{
                         let val_str = String::from_utf8(out.stdout[..(out.stdout.len() -1)].to_vec()).unwrap();
-                        let val = val_str.parse::<i32>().expect("error ocured while getting main screen brightness");
-                        let val = val/98;
+                        let mut val = val_str.parse::<i32>().expect("error ocured while getting main screen brightness");
+                        val = val/98;
+                        if val == 0 {
+                            val += 1;
+                        }
                         if val != prev {
                             prev = val;
                             execute(&format!("{}", val));
