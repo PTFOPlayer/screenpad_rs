@@ -1,1 +1,1 @@
-cat $HOME/.config/screenpad_rs/brightness
+cat /usr/share/screenpad_rs/brightness

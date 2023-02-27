@@ -1,2 +1,2 @@
 echo "$@" | sudo tee '/sys/class/leds/asus::screenpad/brightness'
-echo "$@" > ~/.config/screenpad_rs/brightness
+echo "$@" > /usr/share/screenpad_rs/brightness

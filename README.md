@@ -33,7 +33,8 @@ Simple CLI wrapper to change brightness of asus screenpad
     sudo cp target/release/screenpad_rs /usr/bin
     sudo cp ./src/brightness.sh /usr/bin/brightness.sh
     sudo cp ./src/current.sh /usr/bin/current.sh
-    mkdir ~/.config/screenpad_rs
+    sudo mkdir /usr/share/screenpad_rs
+    sudo echo 100 > /usr/share/screenpad_rs/brightness
     ```
   ### automatic synchronization
     * if you want to use synchronization service you need to do:
