@@ -79,9 +79,11 @@ fn arg_parser() {
         "--watch" | "-w" => {
             let mut prev = 0;
             loop {
-                let mut set = Command::new("cat");
-                let out = set
-                .arg("/sys/class/backlight/intel_backlight/brightness");
+                if current() != "0" {
+
+                    let mut set = Command::new("cat");
+                    let out = set
+                    .arg("/sys/class/backlight/intel_backlight/brightness");
                 match out.output() {
                     Ok(out)=>{
                         let val_str = String::from_utf8(out.stdout[..(out.stdout.len() -1)].to_vec()).unwrap();
@@ -98,6 +100,9 @@ fn arg_parser() {
                     Err(err)=>{println!("error: {}",err)}
                 }
                 sleep(Duration::from_secs_f32(0.2))
+            } else {
+                sleep(Duration::from_secs_f32(5.0))
+            }
             }
         }
         "--help" | "-h" => { println!("
