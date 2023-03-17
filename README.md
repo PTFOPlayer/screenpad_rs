@@ -3,6 +3,9 @@ Simple CLI wrapper to change brightness of asus screenpad
 
 
 # instalation
+  ### pre-compiled binaries
+    * if you want, you can use precompiled binaries in screenpad_rs_binaries.tar.gz
+
   ### dependencies:
     * rustup
     * wget
