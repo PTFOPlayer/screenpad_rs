@@ -7,7 +7,6 @@ use std::{
     thread::sleep,
     time::Duration,
 };
-mod installer;
 
 lazy_static! {
     static ref ARGS:Vec<String> = {
@@ -17,12 +16,6 @@ lazy_static! {
     };
     static ref ARG_1:String = ARGS[1].clone();
     static ref ARG_2:String = ARGS[2].clone();
-
-    // change this to true if you want to use build in installer
-    // installer installs Plippos Asus-wmi-screenpad
-    // please do not use it
-    static ref INSTALLER_STATUS: bool = false;
-    // static ref INSTALLER_STATUS: bool = true;
 }
 
 fn main() {
@@ -31,17 +24,6 @@ fn main() {
 
 fn arg_parser() {
     match ARG_1.as_str() {
-        "--install" | "-i" => {
-            if *INSTALLER_STATUS {
-                if installer::install_asus_wmi() {
-                    println!("After reboot run:\n sudo chmod a+w '/sys/class/leds/asus::screenpad/brightness'", )
-                } else {
-                    println!("Error installing")
-                }
-            } else {
-                println!("installer disabled, you can enable it by commenting line 19 and uncommenting line 20")
-            }
-        }
         "--brightness" | "-b" => {
             let brightness = ARG_2.as_str();
             let b_int: i32 = match brightness.parse() {

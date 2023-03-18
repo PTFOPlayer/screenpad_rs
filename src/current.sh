@@ -1,1 +1,1 @@
-cat /usr/share/screenpad_rs/brightness
+cat /var/screenpad_rs/brightness
