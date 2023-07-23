@@ -51,8 +51,8 @@ fn execute(brightness: &str) {
 }
 
 fn current() -> String {
-    let mut set = Command::new("sh");
-    let out = set.arg("/usr/bin/current.sh");
+    let mut set = Command::new("cat");
+    let out = set.arg("/sys/class/leds/asus::screenpad/brightness");
     match out.output() {
         Ok(out) => String::from_utf8(out.stdout[..(out.stdout.len() - 1)].to_vec()).unwrap(),
         Err(_) => {
