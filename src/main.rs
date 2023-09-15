@@ -41,17 +41,13 @@ fn arg_parser() {
     }
 }
 
+#[inline(always)]
 fn execute(brightness: &str) {
-    let res = std::fs::write(
+    std::fs::write(
         "/sys/class/leds/asus::screenpad/brightness",
         brightness.as_bytes(),
-    );
-    match res {
-        Ok(_) => {}
-        Err(err) => {
-            println!("error: {}", err)
-        }
-    }
+    )
+    .expect("error changing brigtness");
 }
 
 fn current() -> String {
@@ -88,7 +84,7 @@ fn off() {
         .output();
     match out {
         Ok(_) => {
-            println!("screenpad off (brightness set to 0, turning off actually ony works on KDE)");
+            println!("screenpad off (brightness set to 0, turning off actually only works on KDE)");
             execute("0");
         }
         Err(_) => {
@@ -138,26 +134,26 @@ fn watch() {
     };
     let mut prev = 0;
     loop {
-        let file = std::fs::read("/sys/class/backlight/intel_backlight/brightness");
-        match file {
-            Ok(res) => {
-                let val_str = String::from_utf8(res[..(res.len() - 1)].to_vec()).unwrap();
-                let mut val = val_str
-                    .parse::<i32>()
-                    .expect("error ocured while getting main screen brightness");
-                val = val / 98 + 1;
-                if val != prev {
-                    prev = val;
-                    execute(&format!("{}", val));
-                }
-            }
-            Err(err) => {
-                println!("error: {}", err)
-            }
+        let file = std::fs::read("/sys/class/backlight/intel_backlight/brightness")
+            .expect("error reading brightness from main screen");
+
+        let val_str = String::from_utf8(file[..(file.len() - 1)].to_vec()).unwrap();
+
+        let mut val = val_str
+            .parse::<i32>()
+            .expect("error ocured while getting main screen brightness");
+        val = val / 98 + 1;
+
+        if val != prev {
+            prev = val;
+            execute(&format!("{}", val));
         }
+
         sleep(Duration::from_secs_f32(0.2))
     }
 }
+
+
 
 fn up() {
     match current().parse::<i32>() {
