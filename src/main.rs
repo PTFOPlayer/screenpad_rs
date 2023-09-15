@@ -51,10 +51,9 @@ fn execute(brightness: &str) {
 }
 
 fn current() -> String {
-    let mut set = Command::new("cat");
-    let out = set.arg("/sys/class/leds/asus::screenpad/brightness");
-    match out.output() {
-        Ok(out) => String::from_utf8(out.stdout[..(out.stdout.len() - 1)].to_vec()).unwrap(),
+    let file = std::fs::read("/sys/class/leds/asus::screenpad/brightness");
+    match file {
+        Ok(res) => String::from_utf8(res[..(res.len() - 1)].to_vec()).unwrap(),
         Err(_) => {
             println!("error ocured reading brightness");
             exit(1)
@@ -110,11 +109,10 @@ fn on() {
 }
 
 fn sync() {
-    let mut set = Command::new("cat");
-    let out = set.arg("/sys/class/backlight/intel_backlight/brightness");
-    match out.output() {
-        Ok(out) => {
-            let val_str = String::from_utf8(out.stdout[..(out.stdout.len() - 1)].to_vec()).unwrap();
+    let file = std::fs::read("/sys/class/backlight/intel_backlight/brightness");
+    match file {
+        Ok(res) => {
+            let val_str = String::from_utf8(res[..(res.len() - 1)].to_vec()).unwrap();
             let val = val_str
                 .parse::<i32>()
                 .expect("error ocured while getting main screen brightness");
@@ -130,19 +128,15 @@ fn sync() {
 fn watch() {
     let mut prev = 0;
     loop {
-        let mut set = Command::new("cat");
-        let out = set.arg("/sys/class/backlight/intel_backlight/brightness");
-        match out.output() {
-            Ok(out) => {
+        let file = std::fs::read("/sys/class/backlight/intel_backlight/brightness");
+        match file {
+            Ok(res) => {
                 let val_str =
-                    String::from_utf8(out.stdout[..(out.stdout.len() - 1)].to_vec()).unwrap();
+                    String::from_utf8(res[..(res.len() - 1)].to_vec()).unwrap();
                 let mut val = val_str
                     .parse::<i32>()
                     .expect("error ocured while getting main screen brightness");
-                val = val / 98;
-                if val == 0 {
-                    val += 1;
-                }
+                val = val / 98 + 1;
                 if val != prev {
                     prev = val;
                     execute(&format!("{}", val));
