@@ -8,6 +8,8 @@ use std::{
     time::Duration,
 };
 
+use sudo::{check, escalate_if_needed};
+
 lazy_static! {
     static ref ARGS: Vec<String> = {
         let mut args: Vec<String> = env::args().collect();
@@ -40,9 +42,11 @@ fn arg_parser() {
 }
 
 fn execute(brightness: &str) {
-    let mut set = Command::new("sh");
-    let out = set.arg("/usr/bin/brightness.sh").arg(brightness);
-    match out.output() {
+    let res = std::fs::write(
+        "/sys/class/leds/asus::screenpad/brightness",
+        brightness.as_bytes(),
+    );
+    match res {
         Ok(_) => {}
         Err(err) => {
             println!("error: {}", err)
@@ -126,13 +130,18 @@ fn sync() {
 }
 
 fn watch() {
+    match check() {
+        sudo::RunningAs::Root => {}
+        _ => {
+            let _ = escalate_if_needed();
+        }
+    };
     let mut prev = 0;
     loop {
         let file = std::fs::read("/sys/class/backlight/intel_backlight/brightness");
         match file {
             Ok(res) => {
-                let val_str =
-                    String::from_utf8(res[..(res.len() - 1)].to_vec()).unwrap();
+                let val_str = String::from_utf8(res[..(res.len() - 1)].to_vec()).unwrap();
                 let mut val = val_str
                     .parse::<i32>()
                     .expect("error ocured while getting main screen brightness");
