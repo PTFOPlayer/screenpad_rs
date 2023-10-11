@@ -16,16 +16,12 @@ lazy_static! {
         args.append(&mut vec!["".to_owned()]);
         args
     };
-    static ref ARG_1: String = ARGS[1].clone();
-    static ref ARG_2: String = ARGS[2].clone();
+    static ref ARG_1: &'static str = &ARGS[1];
+    static ref ARG_2: &'static str = &ARGS[2];
 }
 
 fn main() {
-    arg_parser();
-}
-
-fn arg_parser() {
-    match ARG_1.as_str() {
+    match *ARG_1 {
         "--brightness" | "-b" => brightness(),
         "--off" | "-f" => off(),
         "--on" | "-n" => on(),
@@ -35,9 +31,7 @@ fn arg_parser() {
         "--down" | "-d" => down(),
         "--watch" | "-w" => watch(),
         "--help" | "-h" => help(),
-        &_ => {
-            println!("wrong argument, see --help");
-        }
+        &_ => println!("wrong argument, see --help"),
     }
 }
 
@@ -53,20 +47,23 @@ fn execute(brightness: &str) {
 fn current() -> String {
     let file = std::fs::read("/sys/class/leds/asus::screenpad/brightness");
     match file {
-        Ok(res) => String::from_utf8(res[..(res.len() - 1)].to_vec()).unwrap(),
+        Ok(res) => {
+            let temp: &str = unsafe { std::mem::transmute(&res[..(res.len() - 1)]) };
+            temp.to_owned()
+        }
         Err(_) => {
-            println!("error ocured reading brightness");
+            println!("error occured reading brightness");
             exit(1)
         }
     }
 }
 
 fn brightness() {
-    let brightness = ARG_2.as_str();
+    let brightness = *ARG_2;
     let b_int: i32 = match brightness.parse() {
         Ok(res) => res,
         Err(_) => {
-            println!("wrong value provided, setting value to 100");
+            println!("wrong value provided, setting brightness to 100");
             100
         }
     };
@@ -112,10 +109,11 @@ fn sync() {
     let file = std::fs::read("/sys/class/backlight/intel_backlight/brightness");
     match file {
         Ok(res) => {
-            let val_str = String::from_utf8(res[..(res.len() - 1)].to_vec()).unwrap();
+            let val_str: &str = unsafe { std::mem::transmute(&res[..(res.len() - 1)]) };
+
             let val = val_str
                 .parse::<i32>()
-                .expect("error ocured while getting main screen brightness");
+                .expect("error occured while getting main screen brightness");
             let val = val / 98;
             execute(&format!("{}", val));
         }
@@ -132,28 +130,27 @@ fn watch() {
             let _ = escalate_if_needed();
         }
     };
-    let mut prev = 0;
+    let mut prev = "".to_string();
     loop {
         let file = std::fs::read("/sys/class/backlight/intel_backlight/brightness")
             .expect("error reading brightness from main screen");
+        
+        let val_str = unsafe { String::from_utf8_unchecked(file[..(file.len() - 1)].to_vec()) };
 
-        let val_str = String::from_utf8(file[..(file.len() - 1)].to_vec()).unwrap();
+        if val_str != prev {
+            let mut val = val_str
+                .parse::<i32>()
+                .expect("error occured while getting main screen brightness");
 
-        let mut val = val_str
-            .parse::<i32>()
-            .expect("error ocured while getting main screen brightness");
-        val = val / 98 + 1;
+            val = val / 98 + 1;
 
-        if val != prev {
-            prev = val;
+            prev = val_str;
             execute(&format!("{}", val));
         }
 
         sleep(Duration::from_secs_f32(0.2))
     }
 }
-
-
 
 fn up() {
     match current().parse::<i32>() {

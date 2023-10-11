@@ -41,16 +41,16 @@ sudo systemctl start screenpad_rs.service
 sudo systemctl enable screenpad_rs.service
 ```
 # Usage
-| flag | simplified | what is doing | 
-| ---| --- | --- |
-| --brightness | -b |   : changes brightness in values from 1 to 255, |
-| --sync | -s |   : synchronizes brightness of screenpad with main screen |
-| --current | -c |   : gives current brightness of screenpad |
-| --off | -f |   : turns screenpad off, |
-| --on | -n |   : turns screenpad on, |
-| --up | -u |   : increases brightness by 10 |
-| --down | -d |   : decreases brightness by 10 |
-| --watch | -w |   : automatic sync |
+| flag         | simplified | what is doing                                         |
+| ------------ | ---------- | ----------------------------------------------------- |
+| --brightness | -b         | changes brightness in values from 1 to 255,           |
+| --sync       | -s         | synchronizes brightness of screenpad with main screen |
+| --current    | -c         | gives current brightness of screenpad                 |
+| --off        | -f         | turns screenpad off,                                  |
+| --on         | -n         | turns screenpad on,                                   |
+| --up         | -u         | increases brightness by 10                            |
+| --down       | -d         | decreases brightness by 10                            |
+| --watch      | -w         | automatic sync                                        |
 
 ### TODO
 * Touch mapping on/off
